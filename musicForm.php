@@ -48,21 +48,25 @@
         	$dist[8] = $dist[7] + $suicide + 1;
             try {
                 $iniData = parse_ini_file("data.ini.php", true);
-                $database = new PDO('mysql:host=127.0.0.1;dbname=playground16', $iniData['insecure']['user'], $iniData['insecure']['pass']);
+                $database = new PDO('mysql:host=127.0.0.1;dbname=playground16', 'playground_user', '2dQM2NSLWrWuKPWV');
             } catch (PDOEXCEPTION $e) {
                 print($e->getMessage());
                 die();
             }
-            echo "<p>here are ten albums you should listen to:</p>";
-            for ($i = 0; $i < 10; $i++) {
+            echo "<h3>here are ten albums you should listen to:</h3>";
+            for ($i = 0; $i < 10; ) {
             	$r = rand(0, $dist[8] - 1);
             	$j = 8;
             	while ($r < $dist[$j]) {
             		$j--;
             	}
-            	$sql = "SELECT Album2 FROM `flowchart` WHERE Album1 = $albums[$j] ORDER BY RAND() LIMIT 1";
+            	$sql = "SELECT Album1, Album2 FROM `flowchart` ORDER BY RAND()";
             	foreach ($database->query($sql) as $row) {
-					echo "<p>".$row['Album2']."</p>";
+					if (strcmp($row['Album1'], $albums[$j]) == 0) {
+						echo "<p>".$row['Album2']."</p>";
+						$i++;
+						break;
+					}
 				}
             }
         }
@@ -124,7 +128,7 @@
 	$(document).ready(function(){
 		$.validator.addMethod("rating", function(value, element) {
 			return this.optional(element) || /^[0-9]+$/i.test(value);
-		}, "rating must contain only letters, periods, underscores, and numbers.");
+		}, "rating must be a number.");
 		$("#register-form").validate({
 			rules: {
 				passConfirm: {
